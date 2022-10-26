@@ -1,0 +1,14 @@
+#ifndef _TREE_ERROR_
+#define _TREE_ERROR_
+
+typedef enum{
+    TREE_CREATED,
+    TREE_IS_ALREADY_CREATED,
+    TREE_CLEARED,
+    TREE_IS_ALREADY_CLEARED,
+    TREE_NOT_EMPTY,
+    TREE_EMPTY,
+    ELEMENT_INSERTED,
+}TreeError_t;
+
+#endif
