@@ -28,8 +28,30 @@ static Time_t TempRunWayTime;
 int RunwayTimeSum = 0;
 static Plane_t Plane;
 
+AppError_t AirPortApplication(void){
+	Time_t NowTime;
+	int i = 0;
+	AppInit();
+	for(NowTime.hr = 0; NowTime.hr < 24; NowTime.hr++){
+		for(NowTime.min = 0; NowTime.min < 60; NowTime.min++){
+			for(NowTime.sec = 0; NowTime.sec < 60; NowTime.sec++){
+				/* Asumming 1 second == 10^5 Iterations */
+				for(long long loopsSec = 0; loopsSec <= 1000000; loopsSec++);				
+				
+				LaunchPlane(NowTime);			
+				CheckTakeoff(NowTime);
+				PushToAir(NowTime);
+				CheckLanding(NowTime);
+				PopFromAir(NowTime);
+				PopFromRunWay(NowTime);
+			}
+		}
 
-AppError_t	AppInit(void){
+	}
+	DestroyApp();
+}
+
+static AppError_t	AppInit(void){
 	CreateQueue(&Takeoff);
 	CreateQueue(&Runway);
 	CreateQueue(&Land);
@@ -37,7 +59,7 @@ AppError_t	AppInit(void){
 	return APP_INITIALIZED;
 }
 
-AppError_t	LaunchPlane(Time_t time){
+static AppError_t	LaunchPlane(Time_t time){
 	if(IsSameTime(flights[flight_index].TakeoffTime, time) == TIME_COMPARE_SAME){
 		CreatePlane(&Plane, flights[flight_index % MAX_FLIGHTS]);
 		flight_index++;
@@ -50,7 +72,7 @@ AppError_t	LaunchPlane(Time_t time){
 	}
 }
 
-AppError_t	CheckTakeoff(Time_t time){
+static AppError_t	CheckTakeoff(Time_t time){
 	if(QueueEmpty(Takeoff) != QUEUE_EMPTY){
 		if(QueueEmpty(Runway) == QUEUE_EMPTY){
 			Pop(&Plane, &Takeoff);
@@ -79,7 +101,7 @@ AppError_t	CheckTakeoff(Time_t time){
 	}
 }
 
-AppError_t	CheckLanding(Time_t time){
+static AppError_t	CheckLanding(Time_t time){
 	if(QueueEmpty(Land) != QUEUE_EMPTY){
 		if(QueueEmpty(Runway) == QUEUE_EMPTY){
 			Pop(&Plane, &Land);
@@ -108,7 +130,7 @@ AppError_t	CheckLanding(Time_t time){
 	}
 }
 
-AppError_t PushToAir(Time_t time){
+static AppError_t PushToAir(Time_t time){
 	if(QueueEmpty(Runway) != QUEUE_EMPTY){
 		Plane_t temp;
 		Time_t t;
@@ -129,7 +151,7 @@ AppError_t PushToAir(Time_t time){
 	return RUNWAY_CHECKED;
 }
 
-AppError_t PopFromAir(Time_t time){
+static AppError_t PopFromAir(Time_t time){
 	if(ListEmpty(OnAir) != LIST_EMPTY){
 		int s;
 		ListSize(&s, OnAir);
@@ -148,7 +170,7 @@ AppError_t PopFromAir(Time_t time){
 	return ON_AIR_CHECKED;
 }
 
-AppError_t PopFromRunWay(Time_t time){
+static AppError_t PopFromRunWay(Time_t time){
 	if(QueueEmpty(Runway) != QUEUE_EMPTY){
 		Plane_t temp;
 		QueueFront(&temp, Runway);
@@ -167,7 +189,7 @@ AppError_t PopFromRunWay(Time_t time){
 	return AIRPORT_CHECKED;
 }
 
-AppError_t DestroyApp(void){
+static AppError_t DestroyApp(void){
 	ClearQueue(&Takeoff);
 	ClearQueue(&Land);
 	ClearQueue(&Runway);
