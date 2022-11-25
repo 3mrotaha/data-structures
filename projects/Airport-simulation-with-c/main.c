@@ -9,6 +9,7 @@
 
 int main(void){
 	
+	AirPortApplication();
 	return 0;
 }
 
